@@ -60,8 +60,11 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Dashboard");
 
-  const [heartRate, setHeartRate] = useState("--");
-  const [muscleMovement, setMuscleMovement] = useState("--");
+  const [heartRate, setHeartRate] = useState<string>("--");
+  const [muscleMovement, setMuscleMovement] = useState<string>("--");
+  const [gait, setGait] = useState<number>(0);
+  const [tremor, setTremor] = useState<string>("--");
+  const [voice, setVoice] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
