@@ -74,10 +74,10 @@ export default function Dashboard() {
 
         if (data) {
           setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
-          setMuscleMovement(data.muscleMovement ?? "--");
-          setGait(data.gait || 0);
+          setMuscleMovement(data.muscleMovement || "--");
+          setGait(data.gait || "--");
           setTremor(data.tremor || "--");
-          setVoice(data.voice || 0);
+          setVoice(data.voice || "--");
         }
         }
       } catch (error) {
