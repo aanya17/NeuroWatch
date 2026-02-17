@@ -2,15 +2,8 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Activity,
-  Mic,
-  Upload,
-  Play,
-  Pause,
-  X,
   CheckCircle2,
-  AlertCircle,
-  TrendingUp,
-  Volume2
+  AlertCircle
 } from 'lucide-react';
 
 const FIREBASE_URL =
@@ -29,12 +22,11 @@ const tabs = [
 
 interface VoiceAnalysisResult {
   overallScore: number;
-  pitch: { value: number; status: 'normal' | 'concern' };
-  volume: { value: number; status: 'normal' | 'concern' };
-  clarity: { value: number; status: 'normal' | 'concern' };
-  tremor: { value: number; status: 'normal' | 'concern' };
-  fluency: { value: number; status: 'normal' | 'concern' };
-  recommendations: string[];
+  pitch: number;
+  volume: number;
+  clarity: number;
+  tremor: number;
+  fluency: number;
 }
 
 export function VoiceAnalysis() {
@@ -42,7 +34,8 @@ export function VoiceAnalysis() {
   const [activeTab, setActiveTab] = useState('Voice');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<VoiceAnalysisResult | null>(null);
+  const [analysisResult, setAnalysisResult] =
+    useState<VoiceAnalysisResult | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,57 +52,54 @@ export function VoiceAnalysis() {
     }
   };
 
-  // 🔥 UPDATED ANALYZE FUNCTION
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!uploadedFile) return;
+
     setIsAnalyzing(true);
 
+    // Simulate AI processing
     setTimeout(async () => {
-      const mockResult: VoiceAnalysisResult = {
+      const result: VoiceAnalysisResult = {
         overallScore: 82,
-        pitch: { value: 88, status: 'normal' },
-        volume: { value: 75, status: 'concern' },
-        clarity: { value: 90, status: 'normal' },
-        tremor: { value: 78, status: 'concern' },
-        fluency: { value: 85, status: 'normal' },
-        recommendations: [
-          'Pitch variation is within normal range.',
-          'Volume consistency shows slight variation.',
-          'Speech clarity is excellent.',
-          'Minor tremor detected in sustained vowel sounds.',
-          'Speech fluency is good.',
-        ],
+        pitch: 88,
+        volume: 75,
+        clarity: 90,
+        tremor: 78,
+        fluency: 85,
       };
 
-      setAnalysisResult(mockResult);
+      setAnalysisResult(result);
 
-      // 🔥 SAVE TO FIREBASE
+      // 🔥 Save EVERYTHING to Firebase
       try {
         await fetch(FIREBASE_URL, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
-            voiceScore: mockResult.overallScore,
+            voiceScore: result.overallScore,
+            voiceDetails: {
+              pitch: result.pitch,
+              volume: result.volume,
+              clarity: result.clarity,
+              tremor: result.tremor,
+              fluency: result.fluency,
+            },
           }),
         });
       } catch (error) {
-        console.error("Error saving voice score:", error);
+        console.error("Firebase save error:", error);
       }
 
       setIsAnalyzing(false);
-    }, 3000);
+    }, 2500);
   };
-
-  const getStatusColor = (status: 'normal' | 'concern') =>
-    status === 'normal' ? 'text-[#22C55E]' : 'text-[#F59E0B]';
-
-  const getStatusIcon = (status: 'normal' | 'concern') =>
-    status === 'normal'
-      ? <CheckCircle2 className="w-5 h-5 text-[#22C55E]" />
-      : <AlertCircle className="w-5 h-5 text-[#F59E0B]" />;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
-      {/* Top Navigation */}
+      
+      {/* Top Nav */}
       <div className="bg-white shadow-sm border-b border-[#E2E8F0]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
@@ -144,9 +134,10 @@ export function VoiceAnalysis() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-        <h1 className="text-3xl font-semibold mb-6">Voice Analysis</h1>
+        <h1 className="text-3xl font-semibold mb-6">
+          Voice Analysis
+        </h1>
 
-        {/* Upload */}
         <div className="bg-white rounded-xl shadow-sm p-8 border border-[#E2E8F0] mb-6">
           <input
             ref={fileInputRef}
@@ -155,6 +146,7 @@ export function VoiceAnalysis() {
             onChange={handleFileUpload}
             className="hidden"
           />
+
           <button
             onClick={() => fileInputRef.current?.click()}
             className="px-6 py-3 bg-[#8B5CF6] text-white rounded-lg"
@@ -164,11 +156,12 @@ export function VoiceAnalysis() {
 
           {uploadedFile && (
             <div className="mt-4">
-              <p>{uploadedFile.name}</p>
+              <p className="mb-3">{uploadedFile.name}</p>
+
               <button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing}
-                className="mt-4 px-6 py-3 bg-[#22C55E] text-white rounded-lg"
+                className="px-6 py-3 bg-[#22C55E] text-white rounded-lg"
               >
                 {isAnalyzing ? "Analyzing..." : "Analyze Voice"}
               </button>
@@ -176,16 +169,19 @@ export function VoiceAnalysis() {
           )}
         </div>
 
-        {/* Results */}
         {analysisResult && (
           <div className="bg-white rounded-xl shadow-sm p-8 border border-[#E2E8F0]">
             <h2 className="text-2xl font-semibold mb-4">
               Voice Stability Score: {analysisResult.overallScore}
             </h2>
 
-            {analysisResult.recommendations.map((rec, i) => (
-              <p key={i} className="mb-2">{rec}</p>
-            ))}
+            <div className="space-y-2">
+              <p>Pitch: {analysisResult.pitch}%</p>
+              <p>Volume: {analysisResult.volume}%</p>
+              <p>Clarity: {analysisResult.clarity}%</p>
+              <p>Tremor Control: {analysisResult.tremor}%</p>
+              <p>Fluency: {analysisResult.fluency}%</p>
+            </div>
           </div>
         )}
       </div>
