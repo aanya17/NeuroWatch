@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Activity, Upload, TrendingUp } from 'lucide-react';
 
+const FIREBASE_URL =
+  "https://neurowatch-b3b08-default-rtdb.firebaseio.com/watch_data.json";
+
 const tabs = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Gait', path: '/gait' },
@@ -18,6 +21,7 @@ export function Gait() {
   const [activeTab, setActiveTab] = useState('Gait');
   const [analyzed, setAnalyzed] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [gaitScore, setGaitScore] = useState<number | null>(null);
 
   const handleTabClick = (tab: typeof tabs[0]) => {
     setActiveTab(tab.name);
@@ -32,10 +36,34 @@ export function Gait() {
     }
   };
 
+  // 🔥 Save to Firebase
+  const saveGaitToFirebase = async (score: number) => {
+    try {
+      await fetch(FIREBASE_URL, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gaitScore: score,
+        }),
+      });
+    } catch (error) {
+      console.error("Error saving gait score:", error);
+    }
+  };
+
   const handleAnalyze = () => {
     if (fileName) {
-      // Simulate analysis
+
+      // ⚡ Replace this with your real ML result if needed
+      const realScore = 87; 
+
+      setGaitScore(realScore);
       setAnalyzed(true);
+
+      // 🔥 SAVE TO FIREBASE
+      saveGaitToFirebase(realScore);
     }
   };
 
@@ -49,11 +77,12 @@ export function Gait() {
               <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center">
                 <Activity className="w-5 h-5 text-white" />
               </div>
-              <span className="text-[#0F172A] text-xl" style={{ fontWeight: 600 }}>NeuroWatch</span>
+              <span className="text-[#0F172A] text-xl" style={{ fontWeight: 600 }}>
+                NeuroWatch
+              </span>
             </div>
           </div>
-          
-          {/* Tabs */}
+
           <div className="flex gap-1">
             {tabs.map((tab) => (
               <button
@@ -75,8 +104,12 @@ export function Gait() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-[#0F172A] text-3xl mb-2" style={{ fontWeight: 600 }}>Gait Analysis</h1>
-          <p className="text-[#64748B]">Upload a video to analyze your walking pattern</p>
+          <h1 className="text-[#0F172A] text-3xl mb-2" style={{ fontWeight: 600 }}>
+            Gait Analysis
+          </h1>
+          <p className="text-[#64748B]">
+            Upload a video to analyze your walking pattern
+          </p>
         </div>
 
         {/* Upload Area */}
@@ -86,9 +119,13 @@ export function Gait() {
               <div className="w-16 h-16 bg-[#2563EB]/10 rounded-full flex items-center justify-center mb-4">
                 <Upload className="w-8 h-8 text-[#2563EB]" />
               </div>
-              <h3 className="text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>Upload Video</h3>
-              <p className="text-[#64748B] mb-4">Drag and drop a video file or click to browse</p>
-              
+              <h3 className="text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>
+                Upload Video
+              </h3>
+              <p className="text-[#64748B] mb-4">
+                Drag and drop a video file or click to browse
+              </p>
+
               <input
                 type="file"
                 id="video-upload"
@@ -102,9 +139,11 @@ export function Gait() {
               >
                 Choose File
               </label>
-              
+
               {fileName && (
-                <p className="mt-4 text-[#22C55E]">Selected: {fileName}</p>
+                <p className="mt-4 text-[#22C55E]">
+                  Selected: {fileName}
+                </p>
               )}
             </div>
           </div>
@@ -126,38 +165,23 @@ export function Gait() {
         </div>
 
         {/* Result Card */}
-        {analyzed && (
+        {analyzed && gaitScore !== null && (
           <div className="bg-white rounded-xl shadow-sm p-8 border border-[#E2E8F0]">
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-5 h-5 text-[#22C55E]" />
-              <h2 className="text-[#0F172A] text-xl" style={{ fontWeight: 600 }}>Analysis Results</h2>
+              <h2 className="text-[#0F172A] text-xl" style={{ fontWeight: 600 }}>
+                Analysis Results
+              </h2>
             </div>
-            
+
             <div className="bg-[#F8FAFC] rounded-xl p-8 text-center">
               <div className="mb-4">
                 <span className="text-[#64748B]">Gait Score</span>
               </div>
-              <div className="text-6xl text-[#22C55E] mb-4" style={{ fontWeight: 600 }}>87</div>
+              <div className="text-6xl text-[#22C55E] mb-4" style={{ fontWeight: 600 }}>
+                {gaitScore}
+              </div>
               <div className="text-[#64748B]">Good</div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-lg">
-                <span className="text-[#0F172A]">Step Length</span>
-                <span className="text-[#22C55E]" style={{ fontWeight: 600 }}>Normal</span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-lg">
-                <span className="text-[#0F172A]">Stride Width</span>
-                <span className="text-[#22C55E]" style={{ fontWeight: 600 }}>Normal</span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-lg">
-                <span className="text-[#0F172A]">Walking Speed</span>
-                <span className="text-[#F59E0B]" style={{ fontWeight: 600 }}>Slightly Slow</span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-lg">
-                <span className="text-[#0F172A]">Balance</span>
-                <span className="text-[#22C55E]" style={{ fontWeight: 600 }}>Good</span>
-              </div>
             </div>
           </div>
         )}
