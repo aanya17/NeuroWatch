@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Gait from "./pages/Gait";
-import VoiceAnalysis from "./pages/Voice";
+import VoiceAnalysis from "./pages/VoiceAnalysis";
 
 function App() {
   return (
