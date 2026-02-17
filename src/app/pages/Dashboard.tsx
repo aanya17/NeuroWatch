@@ -6,10 +6,7 @@ import {
   TrendingUp,
   AlertCircle,
   Brain,
-  Footprints,
-  Watch,
-  Utensils,
-  Lightbulb
+  Footprints
 } from 'lucide-react';
 import {
   LineChart,
@@ -36,8 +33,6 @@ const tabs = [
   { name: 'Support', path: '/support' },
 ];
 
-const progressData: any[] = []; // unchanged
-
 interface MetricCardProps {
   title: string;
   value: string;
@@ -59,36 +54,15 @@ function MetricCard({ title, value, icon, color }: MetricCardProps) {
   );
 }
 
-interface ProgressBarProps {
-  label: string;
-  value: number;
-  color: string;
-}
-
-function ProgressBar({ label, value, color }: ProgressBarProps) {
-  return (
-    <div className="mb-4">
-      <div className="flex justify-between mb-2">
-        <span className="text-[#0F172A]">{label}</span>
-        <span className="text-[#64748B]">{value}%</span>
-      </div>
-      <div className="w-full bg-[#F1F5F9] rounded-full h-3">
-        <div
-          className={`h-3 rounded-full ${color}`}
-          style={{ width: `${value}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function Dashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Dashboard');
 
-  // 🔥 Firebase States
-  const [heartRate, setHeartRate] = useState<string>("--");
-  const [muscleMovement, setMuscleMovement] = useState<string>("--");
+  // 🔥 Dynamic States
+  const [gaitScore, setGaitScore] = useState("--");
+  const [voiceScore, setVoiceScore] = useState("--");
+  const [heartRate, setHeartRate] = useState("--");
+  const [muscleMovement, setMuscleMovement] = useState("--");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,16 +71,18 @@ export function Dashboard() {
         const data = await res.json();
 
         if (data) {
+          setGaitScore(data.gaitScore ?? "--");
+          setVoiceScore(data.voiceScore ?? "--");
           setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
-          setMuscleMovement(data.muscleMovement || "--");
+          setMuscleMovement(data.muscleMovement ?? "--");
         }
       } catch (error) {
-        console.error("Firebase error:", error);
+        console.error("Firebase fetch error:", error);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 3000);
+    const interval = setInterval(fetchData, 3000); // auto refresh every 3 sec
     return () => clearInterval(interval);
   }, []);
 
@@ -117,7 +93,7 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
-      {/* Top Navigation */}
+      {/* Navigation */}
       <div className="bg-white shadow-sm border-b border-[#E2E8F0]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
@@ -149,82 +125,49 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+
         <div className="mb-8">
           <h1 className="text-[#0F172A] text-3xl font-semibold mb-2">
             Welcome 👋
           </h1>
           <p className="text-[#64748B]">
-            Your health overview
+            Live health overview from Watch + AI
           </p>
         </div>
 
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
           <MetricCard
             title="Gait Score"
-            value="--"
+            value={gaitScore.toString()}
             icon={<Footprints className="w-6 h-6 text-white" />}
             color="bg-[#2563EB]"
           />
+
           <MetricCard
-            title="Tremor Level"
-            value={muscleMovement}
-            icon={<Activity className="w-6 h-6 text-white" />}
-            color="bg-[#22C55E]"
+            title="Voice Stability"
+            value={voiceScore.toString()}
+            icon={<TrendingUp className="w-6 h-6 text-white" />}
+            color="bg-[#8B5CF6]"
           />
+
           <MetricCard
             title="Heart Rate"
             value={heartRate}
             icon={<Heart className="w-6 h-6 text-white" />}
             color="bg-[#38BDF8]"
           />
+
           <MetricCard
-            title="Neuro Risk Level"
-            value="--"
+            title="Muscle Movement"
+            value={muscleMovement.toString()}
             icon={<AlertCircle className="w-6 h-6 text-white" />}
-            color="bg-[#F59E0B]"
+            color="bg-[#22C55E]"
           />
-        </div>
 
-        {/* Health Overview */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-[#E2E8F0] mb-8">
-          <div className="flex items-center gap-2 mb-6">
-            <Brain className="w-5 h-5 text-[#2563EB]" />
-            <h2 className="text-[#0F172A] text-xl font-semibold">
-              Health Overview
-            </h2>
-          </div>
-
-          <ProgressBar label="Gait" value={0} color="bg-[#2563EB]" />
-          <ProgressBar label="Tremor" value={0} color="bg-[#22C55E]" />
-          <ProgressBar label="Muscle Movement" value={0} color="bg-[#38BDF8]" />
-          <ProgressBar label="Voice Stability" value={0} color="bg-[#8B5CF6]" />
-        </div>
-
-        {/* Progress Chart */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-[#E2E8F0]">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-[#2563EB]" />
-            <h2 className="text-[#0F172A] text-xl font-semibold">
-              Progress Charts
-            </h2>
-          </div>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={progressData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="gait" stroke="#2563EB" />
-              <Line type="monotone" dataKey="tremor" stroke="#22C55E" />
-              <Line type="monotone" dataKey="voice" stroke="#8B5CF6" />
-              <Line type="monotone" dataKey="muscle" stroke="#38BDF8" />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
       </div>
     </div>
