@@ -107,22 +107,21 @@ export function Dashboard() {
             </div>
           </div>
 
-          <div className="flex gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.name}
-                onClick={() => handleTabClick(tab)}
-                className={`px-5 py-3 transition-colors ${
-                  activeTab === tab.name
-                    ? 'text-[#2563EB] border-b-2 border-[#2563EB]'
-                    : 'text-[#64748B] hover:text-[#0F172A]'
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </div>
-        </div>
+         <div className="flex gap-1">
+  {tabs.map((tab) => (
+    <button
+      key={tab.name}
+      onClick={() => handleTabClick(tab)}
+      className={`px-5 py-3 transition-colors ${
+        activeTab === tab.name
+          ? 'text-[#2563EB] border-b-2 border-[#2563EB]'
+          : 'text-[#64748B] hover:text-[#0F172A]'
+      }`}
+    >
+      {tab.name}
+    </button>
+  ))}
+</div>
       </div>
 
       {/* Content */}
