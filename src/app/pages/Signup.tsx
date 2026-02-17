@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Activity, Mail, User, Lock } from 'lucide-react';
 import { useAuth } from '@/app/context/AuthContext';
 import { BACKEND_URL } from "../../config";
