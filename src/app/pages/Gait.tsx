@@ -3,7 +3,7 @@ import { useState } from "react";
 const BASE_URL =
   "https://neurowatch-b3b08-default-rtdb.firebaseio.com/users";
 
-export function Gait() {
+export default function Gait() {
   const [score, setScore] = useState<number | null>(null);
   const userId = localStorage.getItem("userId");
 
