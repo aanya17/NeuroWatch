@@ -75,6 +75,10 @@ export default function Dashboard() {
         if (data) {
           setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
           setMuscleMovement(data.muscleMovement ?? "--");
+          setGait(data.gait || 0);
+          setTremor(data.tremor || "--");
+          setVoice(data.voice || 0);
+        }
         }
       } catch (error) {
         console.error("Firebase error:", error);
