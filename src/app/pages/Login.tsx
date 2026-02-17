@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const FIREBASE_URL =
   "https://neurowatch-b3b08-default-rtdb.firebaseio.com/users.json";
 
-export function Login() {
+export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
