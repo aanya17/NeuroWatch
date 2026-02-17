@@ -67,30 +67,29 @@ export default function Dashboard() {
   const [voice, setVoice] = useState<number>(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(FIREBASE_URL);
-        const data = await res.json();
+  const fetchData = async () => {
+    try {
+      const res = await fetch(FIREBASE_URL);
+      const data = await res.json();
 
-        console.log("FIREBASE DATA:", data);
-        
-        if (data) {
-          setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
-          setMuscleMovement(data.muscleMovement || "--");
-          setGait(data.gait || "--");
-          setTremor(data.tremor || "--");
-          setVoice(data.voice || "--");
-        }
-        }
-      } catch (error) {
-        console.error("Firebase error:", error);
+      console.log("FIREBASE DATA:", data);
+
+      if (data) {
+        setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
+        setMuscleMovement(data.muscleMovement || "--");
+        setGait(data.gait || 0);
+        setTremor(data.tremor || "--");
+        setVoice(data.voice || 0);
       }
-    };
+    } catch (error) {
+      console.error("Firebase error:", error);
+    }
+  };
 
-    fetchData();
-    const interval = setInterval(fetchData, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  fetchData();
+  const interval = setInterval(fetchData, 3000);
+  return () => clearInterval(interval);
+}, []);
 
   const handleTabClick = (tab: typeof tabs[0]) => {
     setActiveTab(tab.name);
