@@ -8,16 +8,6 @@ import {
   Brain,
   Footprints
 } from 'lucide-react';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend
-} from 'recharts';
 
 const FIREBASE_URL =
   "https://neurowatch-b3b08-default-rtdb.firebaseio.com/watch_data.json";
