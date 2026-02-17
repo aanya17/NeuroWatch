@@ -72,6 +72,8 @@ export default function Dashboard() {
         const res = await fetch(FIREBASE_URL);
         const data = await res.json();
 
+        console.log("FIREBASE DATA:", data);
+        
         if (data) {
           setHeartRate(data.heartRate ? `${data.heartRate} bpm` : "--");
           setMuscleMovement(data.muscleMovement || "--");
